@@ -1,11 +1,20 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using EmployeePerformance.Web.Data;
+using Microsoft.EntityFrameworkCore;
 using EmployeePerformance.Web.Models;
 
 namespace EmployeePerformance.Web.Controllers;
 
 public class HomeController : Controller
 {
+    private readonly ApplicationDbContext _db;
+
+    public HomeController(ApplicationDbContext db)
+    {
+        _db = db;
+    }
     private readonly ILogger<HomeController> _logger;
 
     public HomeController(ILogger<HomeController> logger)
@@ -13,8 +22,11 @@ public class HomeController : Controller
         _logger = logger;
     }
 
-    public IActionResult Index()
+    [Authorize]
+    public async Task<IActionResult> Index()
     {
+        var goalsCount = await _db.Goals.CountAsync();
+        ViewBag.GoalsCount = goalsCount;
         return View();
     }
 
