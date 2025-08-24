@@ -1,0 +1,39 @@
+@model EmployeePerformance.Web.Models.Goal
+@{
+    ViewData["Title"] = "Goal Details";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>@Model.Title</h2>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Edit</a>
+    </div>
+    <p class="text-muted">@Model.Description</p>
+    <div class="mb-4">
+        <span class="badge bg-info">@Model.Status</span>
+        @if (Model.DueDate.HasValue){<span class="ms-2">Due @Model.DueDate.Value.ToShortDateString()</span>}
+    </div>
+
+    <h5 class="mt-4">Feedback</h5>
+    <form asp-controller="Feedback" asp-action="Create" method="post" class="mb-3">
+        <input type="hidden" name="goalId" value="@Model.Id" />
+        <div class="input-group">
+            <input class="form-control" name="comments" placeholder="Share feedback..." required />
+            <button class="btn btn-primary" type="submit">Submit</button>
+        </div>
+    </form>
+
+    <ul class="list-group">
+        @foreach (var f in Model.Feedbacks.OrderByDescending(f => f.SubmittedAtUtc))
+        {
+            <li class="list-group-item">
+                <div class="d-flex justify-content-between">
+                    <strong>@(f.SubmittedBy?.FullName ?? f.SubmittedBy?.Email ?? "User")</strong>
+                    <small class="text-muted">@f.SubmittedAtUtc.ToLocalTime()</small>
+                </div>
+                <div>@f.Comments</div>
+            </li>
+        }
+    </ul>
+</div>
+
